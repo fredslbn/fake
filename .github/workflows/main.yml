@@ -32,7 +32,7 @@ jobs:
           
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-         - run: sdkmanager --install "ndk;27.2.12479018" --channel=3
+         run: sdkmanager --install "ndk;27.2.12479018" --channel=3
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
