@@ -47,27 +47,47 @@ jobs:
 #          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 #          restore-keys: ${{ runner.os }}-gradle-
 
-#      - name: Gradle prebuild
+      - name: Gradle prebuild
+        run: |
+          echo 'org.gradle.jvmargs=-Xmx2048m' >> gradle.properties
+          ./gradlew prebuild
+      
+#      - name: Build release
+#        id: buildRelease
 #        run: |
-#          echo 'org.gradle.jvmargs=-Xmx2048m' >> gradle.properties
-#          ./gradlew prebuild
+#          ./gradlew :app:buildRelease
+#          echo "releaseName=$(ls app/build/apk/release/app-release.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
+          
+      - name: Build debug
+        id: buildDebug
+        run: |
+          ./gradlew :app:buildDebug
+          echo "debugName=$(ls app/build/apk/debug/app-debug.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
+
+      - name: Upload debug
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.buildDebug.outputs.debugName }}
+          path: "app/build/apk/debug/app-debug.apk"
+
           
 #      # Run Tests Build
 #      - name: Run gradle tests
 #        run: ./gradlew test
 
-      # Run Build Project
-      - name: Build gradle project
-        run: ./gradlew build
+#      # Run Build Project
+#      - name: Build gradle project
+#        run: ./gradlew build
 
       # Create APK Debug
-      - name: Build apk debug 
-        run: ./gradlew assembleDebug
+#      - name: Build apk debug 
+#        run: ./gradlew assembleDebug
        # echo "releaseName=$(ls app/build/outputs/apk/debug/app-debug.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
 
       # Create APK Release
-      - name: Build apk release
-        run: ./gradlew assemble
+#      - name: Build apk release
+#        run: ./gradlew assemble
        # echo "releaseName=$(ls app/build/outputs/apk/release/app-release.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
         
       # Upload Artifact Build
@@ -75,14 +95,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: /app/build/outputs/apk/
-          include-hidden-files: true
+          path: /app/build/outputs/apk/app-debug.apk
 
-      - name: Upload APK Release
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release.apk
-          path: /app/build/outputs/apk/
-          include-hidden-files: true
+#      - name: Upload APK Release
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: app-release.apk
+#          path: /app/build/outputs/apk/
+#          include-hidden-files: true
           
 
