@@ -13,17 +13,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Gradle wrapper validation
-        uses: gradle/wrapper-validation-action@v1
+    #  - name: Gradle wrapper validation
+    #    uses: gradle/wrapper-validation-action@v1
         
-        # Set Current Date As Env Variable
-      - name: Set current date as env variable
-        run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-        # Set Repository Name As Env Variable
-      - name: Set repository name as env variable
-        run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
@@ -66,30 +58,37 @@ jobs:
 
       # Run Build Project
       - name: Build gradle project
-        run: ./gradlew clean build
+        run: ./gradlew build
 
       # Create APK Debug
-      - name: Build apk debug project (APK) - ${{ env.main_project_module }} module
+      - name: Build apk debug 
         run: ./gradlew assembleDebug
+       # echo "releaseName=$(ls app/build/outputs/apk/debug/app-debug.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
 
       # Create APK Release
-      - name: Build apk release project (APK) - ${{ env.main_project_module }} module
+      - name: Build apk release
         run: ./gradlew assemble
+       # echo "releaseName=$(ls app/build/outputs/apk/release/app-release.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
         
       # Upload Artifact Build
-      # Noted For Output [main_project_module]/build/outputs/apk/debug/
-      - name: Upload APK Debug - ${{ env.repository_name }}
+      - name: Upload APK Debug
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.date_today }} - ${{ env.repository_name }} - APK(s) debug generated
-          path: ${{ env.main_project_module }}/build/app/outputs/apk/debug/
+          name: app-debug.apk
+          path: /build/app/outputs/apk/debug/
           include-hidden-files: true
 
-      # Noted For Output [main_project_module]/build/outputs/apk/release/
-      - name: Upload APK Release - ${{ env.repository_name }}
+      - name: Upload APK Release
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.date_today }} - ${{ env.repository_name }} - APK(s) release generated
-          path: ${{ env.main_project_module }}/build/app/outputs/apk/release/
+          name: app-release.apk
+          path: /build/app/outputs/apk/release/
           include-hidden-files: true
+          
+      - name: Upload mappings
+        uses: actions/upload-artifact@v4
+        with:
+          name: mappings
+          path: "app/build/outputs/mapping/release"
+
 
