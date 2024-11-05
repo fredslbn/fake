@@ -75,20 +75,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: /build/app/outputs/apk/debug/
+          path: /app/build/outputs/apk/
           include-hidden-files: true
 
       - name: Upload APK Release
         uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
-          path: /build/app/outputs/apk/release/
+          path: /app/build/outputs/apk/
           include-hidden-files: true
           
-      - name: Upload mappings
-        uses: actions/upload-artifact@v4
-        with:
-          name: mappings
-          path: "app/build/outputs/mapping/release"
-
 
