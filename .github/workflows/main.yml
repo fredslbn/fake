@@ -47,9 +47,9 @@ jobs:
 #          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 #          restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Gradle prebuild
-        run:          
-          ./gradlew prebuild
+#      - name: Gradle prebuild
+#        run:          
+#          ./gradlew prebuild
       
 #      - name: Build release
 #        id: buildRelease
@@ -57,18 +57,18 @@ jobs:
 #          ./gradlew :app:buildRelease
 #          echo "releaseName=$(ls app/build/apk/release/app-release.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
           
-      - name: Build debug
-        id: buildDebug
-        run: |
-          ./gradlew :app:buildDebug
-          echo "debugName=$(ls app/build/apk/debug/app-debug.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
+#      - name: Build debug
+#        id: buildDebug
+#        run: |
+#          ./gradlew :app:buildDebug
+#          echo "debugName=$(ls app/build/apk/debug/app-debug.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
 
-      - name: Upload debug
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.buildDebug.outputs.debugName }}
-          path: "app/build/apk/debug/app-debug.apk"
+#      - name: Upload debug
+#        if: success()
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: ${{ steps.buildDebug.outputs.debugName }}
+#          path: "app/build/apk/debug/app-debug.apk"
 
           
 #      # Run Tests Build
@@ -80,21 +80,23 @@ jobs:
 #        run: ./gradlew build
 
       # Create APK Debug
-#      - name: Build apk debug 
-#        run: ./gradlew assembleDebug
-       # echo "releaseName=$(ls app/build/outputs/apk/debug/app-debug.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
+      - name: Build apk debug 
+        run: ./gradlew assembleDebug --stacktrace
 
       # Create APK Release
 #      - name: Build apk release
 #        run: ./gradlew assemble
-       # echo "releaseName=$(ls app/build/outputs/apk/release/app-release.apk | awk -F '(/|.apk)' '{print $5}')" >> $GITHUB_OUTPUT
-        
+
+      - name: Get file apk path
+        id: debugApk
+        run: echo "apkfile=$(find app/build/outputs/apk/debug/*.apk)" >> $GITHUB_OUTPUT
+
       # Upload Artifact Build
       - name: Upload APK Debug
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: app-debug.apk
-          path: /app/build/outputs/apk/app-debug.apk
+           name: debug-artifacts
+           path: ${{ steps.debugApk.outputs.apkfile }}
 
 #      - name: Upload APK Release
 #        uses: actions/upload-artifact@v4
