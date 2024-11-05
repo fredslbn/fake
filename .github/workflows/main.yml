@@ -48,8 +48,7 @@ jobs:
 #          restore-keys: ${{ runner.os }}-gradle-
 
       - name: Gradle prebuild
-        run: |
-          echo 'org.gradle.jvmargs=-Xmx2048m' >> gradle.properties
+        run:          
           ./gradlew prebuild
       
 #      - name: Build release
